@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/copione.schema.json",
+  "title": "Copione teatrale strutturato",
+  "description": "Schema JSON che descrive la struttura di un copione teatrale estratto da OCR, organizzato per metadati, personaggi, ambientazione e sequenza sceneggiatura.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "titolo",
+    "tipo_opera",
+    "autore",
+    "descrizione",
+    "personaggi",
+    "ambientazione_generale",
+    "struttura_sceneggiatura"
+  ],
+  "properties": {
+    "titolo": {
+      "type": "string",
+      "description": "Titolo dell'opera.",
+      "minLength": 1
+    },
+    "tipo_opera": {
+      "type": "string",
+      "description": "Genere o tipo dell'opera, es. 'COMMEDIA IN DUE ATTI'.",
+      "minLength": 1
+    },
+    "autore": {
+      "type": "string",
+      "description": "Nome dell'autore.",
+      "minLength": 1
+    },
+    "descrizione": {
+      "type": "string",
+      "description": "Breve sinossi o presentazione della commedia."
+    },
+    "personaggi": {
+      "type": "array",
+      "description": "Elenco dei personaggi dell'opera.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["nome"],
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome del personaggio, come appare nel testo.",
+            "minLength": 1
+          },
+          "descrizione": {
+            "type": "string",
+            "description": "Ruolo o descrizione del personaggio, es. 'mamma di Carolina e Luigi'."
+          }
+        }
+      }
+    },
+    "ambientazione_generale": {
+      "type": "string",
+      "description": "Descrizione dell'ambientazione scenica iniziale."
+    },
+    "struttura_sceneggiatura": {
+      "type": "array",
+      "description": "Sequenza ordinata degli elementi che compongono il copione (battute, didascalie, musica, marcatori di atto).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["atto", "tipo"],
+        "properties": {
+          "atto": {
+            "type": "string",
+            "description": "Atto a cui appartiene l'elemento, es. 'ATTO I' o 'ATTO II'.",
+            "enum": ["ATTO I", "ATTO II"]
+          },
+          "tipo": {
+            "type": "string",
+            "description": "Tipo di elemento scenico.",
+            "enum": [
+              "battuta",
+              "didascalia",
+              "musica",
+              "inizio_atto",
+              "fine_atto",
+              "fine_opera"
+            ]
+          },
+          "personaggio": {
+            "type": "string",
+            "description": "Nome del personaggio che pronuncia la battuta. Può includere un alias tra parentesi, es. 'Madre (Carmela)'."
+          },
+          "didascalia_scenica": {
+            "type": "string",
+            "description": "Indicazione scenica associata a una battuta, es. '(sottovoce)'."
+          },
+          "didascalia_musicale": {
+            "type": "string",
+            "description": "Indicazione musicale per gli elementi di tipo 'musica'."
+          },
+          "testo": {
+            "type": "string",
+            "description": "Contenuto testuale della battuta, didascalia o marcatore di atto."
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": { "tipo": { "const": "battuta" } }
+            },
+            "then": {
+              "required": ["personaggio", "testo"]
+            }
+          },
+          {
+            "if": {
+              "properties": { "tipo": { "const": "musica" } }
+            },
+            "then": {
+              "required": ["didascalia_musicale"]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "tipo": {
+                  "enum": ["didascalia", "inizio_atto", "fine_atto", "fine_opera"]
+                }
+              }
+            },
+            "then": {
+              "required": ["testo"]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

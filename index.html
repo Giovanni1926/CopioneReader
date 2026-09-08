@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E CHE FAMIGLIA — Copione</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="intestazione">
+    <div class="intestazione-testo">
+      <h1 id="titolo"></h1>
+      <p id="sottotitolo" class="sottotitolo"></p>
+      <p id="autore" class="autore"></p>
+    </div>
+    <div class="azioni-intestazione">
+      <button id="btn-modifica" type="button" title="Modifica i testi del copione" disabled>Modifica</button>
+      <button id="btn-salva" type="button" title="Salva le modifiche sul file copione_strutturato.json" disabled>Salva</button>
+      <button id="btn-file" type="button" title="Apri un altro file copione (JSON)" disabled>Apri…</button>
+      <button id="btn-studio" type="button" title="Modalità studio: ripassa battuta per battuta" disabled>Studio</button>
+      <button id="btn-tema" type="button" title="Cambia tema" aria-label="Cambia tema">◐</button>
+    </div>
+  </header>
+
+  <div class="cornice">
+    <aside class="pannello">
+      <div class="gruppo">
+        <h2>Atto</h2>
+        <div id="atto-tabs" class="tabs" role="tablist"></div>
+      </div>
+
+      <div class="gruppo">
+        <h2>Ricerca</h2>
+        <div class="ricerca">
+          <input type="search" id="campo-ricerca" placeholder="Cerca nel testo…" autocomplete="off" disabled>
+          <div class="ricerca-info">
+            <span id="conteggio-risultati"></span>
+            <span class="ricerca-navigazione">
+              <button id="btn-prec" type="button" title="Risultato precedente" disabled>▲</button>
+              <button id="btn-succ" type="button" title="Risultato successivo" disabled>▼</button>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gruppo">
+        <h2>Personaggi</h2>
+        <div class="personaggi">
+          <div class="personaggi-filtro">
+            <button id="btn-tutti" type="button" class="attivo">Tutti</button>
+            <button id="btn-annulla" type="button" title="Annulla filtro" disabled>✕</button>
+            <button id="btn-nuovo-personaggio" type="button" title="Aggiungi un nuovo personaggio">＋ Personaggio</button>
+          </div>
+          <div id="form-nuovo-personaggio" class="nuovo-personaggio nascosto">
+            <label>Nome
+              <input type="text" id="np-nome" placeholder="es. Beatrice" autocomplete="off">
+            </label>
+            <label>Ruolo / descrizione (facoltativo)
+              <input type="text" id="np-ruolo" placeholder="es. sorella di Carol" autocomplete="off">
+            </label>
+            <div class="nuovo-personaggio-azioni">
+              <button type="button" id="np-salva">Aggiungi</button>
+              <button type="button" id="np-annulla">Annulla</button>
+            </div>
+          </div>
+          <ul id="lista-personaggi" class="lista-personaggi"></ul>
+        </div>
+      </div>
+
+      <div class="gruppo">
+        <h2>Impostazioni di lettura</h2>
+        <div class="impostazioni">
+          <div class="riga-impostazione">
+            <span>Dimensione testo</span>
+            <span class="font-controlli">
+              <button id="font-meno" type="button" title="Riduci testo" aria-label="Riduci testo">A−</button>
+              <button id="font-piu" type="button" title="Aumenta testo" aria-label="Aumenta testo">A+</button>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gruppo">
+        <h2>File</h2>
+        <div id="info-file" class="info-file">Nessun copione caricato.</div>
+      </div>
+
+      <div class="gruppo">
+        <h2>Template / Copione reader</h2>
+        <p class="info-file">Scarica un template pronto da compilare e lo schema JSON che descrive il formato usato dal lettore.</p>
+        <div class="template-azioni">
+          <button id="btn-tpl-copione" type="button" title="Scarica un copione JSON di esempio">Scarica template copione</button>
+          <button id="btn-tpl-schema" type="button" title="Scarica copione.schema.json">Scarica schema JSON</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="lettura">
+      <div id="titolo-atto" class="titolo-atto"></div>
+      <div id="copione"></div>
+      <div id="zona-aggiungi" class="zona-aggiungi">
+        <button id="btn-aggiungi" type="button" title="Aggiungi un elemento al copione">＋ Aggiungi battuta / didascalia</button>
+      </div>
+      <div id="nessun-risultato" class="nessun-risultato nascosto">Nessun risultato.</div>
+    </main>
+  </div>
+
+  <div id="barra-studio" class="barra-studio nascosto">
+    <button id="studio-uscita" type="button" class="studio-chiudi" title="Esci dalla modalità studio">✕</button>
+    <div class="studio-controlli">
+      <span class="studio-titolo">Studio — ripassa la parte di</span>
+      <select id="studio-personaggio" class="studio-select"></select>
+      <button id="studio-prec" type="button" title="Battuta precedente">◀</button>
+      <span id="studio-progresso" class="studio-progresso">0 / 0</span>
+      <button id="studio-succ" type="button" title="Battuta successiva">▶</button>
+      <label class="studio-rivela" title="Rivela la battuta corrente">
+        <input type="checkbox" id="studio-rivela-tutte">
+        <span>Rivela tutto</span>
+      </label>
+    </div>
+    <div class="studio-aiuto">Spazio o Invio: rivela · ← →: naviga</div>
+  </div>
+
+  <div id="sovrapposta" class="sovrapposta">
+    <div class="finestra" role="dialog" aria-modal="true" aria-labelledby="finestra-titolo">
+      <h2 id="finestra-titolo">Carica il copione</h2>
+      <p class="finestra-testo">
+        Seleziona il file <code>copione_strutturato.json</code> per leggere e modificare il copione.
+      </p>
+      <div class="finestra-azioni">
+        <button id="btn-apertura" type="button">Apri copione…</button>
+        <button id="btn-ripristina" type="button" class="nascosto">Riprendi <span id="nome-ripristina"></span></button>
+      </div>
+      <p id="avviso-apertura" class="avviso"></p>
+      <p class="suggerimento">
+        Suggerimento: apri questa pagina in Chrome o Edge: il file aperto potrà essere riscritto direttamente con «Salva».
+        Su altri browser le modifiche potranno essere scaricate come copia aggiornata.
+      </p>
+    </div>
+  </div>
+
+  <input type="file" id="input-file" accept=".json,application/json" class="nascosto">
+
+  <div id="toast" class="toast nascosto" role="status"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
